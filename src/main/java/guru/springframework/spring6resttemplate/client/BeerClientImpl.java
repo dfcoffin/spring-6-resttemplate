@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.UUID;
+
 /**
  * @author Donald F. Coffin, Green Button Alliance, Inc.
  */
@@ -22,6 +24,13 @@ public class BeerClientImpl implements BeerClient {
 	private final RestTemplateBuilder restTemplateBuilder;
 
 	public static final String GET_BEER_PATH = "/api/v1/beer";
+	public static final String GET_BEER_BY_ID_PATH = "/api/v1/beer/{beerId}";
+
+	@Override
+	public BeerDTO getBeerById(UUID beerId) {
+		RestTemplate restTemplate = restTemplateBuilder.build();
+		return restTemplate.getForObject(GET_BEER_BY_ID_PATH, BeerDTO.class, beerId);
+	}
 
 	@Override
 	public Page<BeerDTO> listBeers() {
@@ -29,9 +38,9 @@ public class BeerClientImpl implements BeerClient {
 	}
 
 	@Override
-	public Page<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory, Integer pageNumber, Integer pageSize) {
-		RestTemplate restTemplate =
-				restTemplateBuilder.build();
+	public Page<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory, Integer pageNumber,
+								   Integer pageSize) {
+		RestTemplate restTemplate = restTemplateBuilder.build();
 
 		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromPath(GET_BEER_PATH);
 
@@ -55,8 +64,8 @@ public class BeerClientImpl implements BeerClient {
 			uriComponentsBuilder.queryParam("pageSize", beerStyle);
 		}
 
-		ResponseEntity<BeerDTOPageImpl> response = restTemplate.
-				getForEntity(uriComponentsBuilder.toUriString(), BeerDTOPageImpl.class);
+		ResponseEntity<BeerDTOPageImpl> response =
+				restTemplate.getForEntity(uriComponentsBuilder.toUriString(), BeerDTOPageImpl.class);
 
 		return response.getBody();
 	}
