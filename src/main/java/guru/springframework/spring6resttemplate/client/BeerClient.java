@@ -18,4 +18,6 @@ public interface BeerClient {
 							Boolean showInventory, Integer pageNumber, Integer pageSize);
 
 	BeerDTO getBeerById(UUID beerId);
+
+	BeerDTO createBeer(BeerDTO newDto);
 }
