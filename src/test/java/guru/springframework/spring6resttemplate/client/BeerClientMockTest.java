@@ -62,6 +62,24 @@ public class BeerClientMockTest {
 	}
 
 	@Test
+	void testGetById() throws JsonProcessingException {
+
+		// Generate data
+		BeerDTO dto = getBeerDto();
+
+		// Convert to JSON string
+		String response = objectMapper.writeValueAsString(dto);
+
+		server.expect(method(HttpMethod.GET))
+				.andExpect(requestToUriTemplate(URL +
+						BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
+				.andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+
+		BeerDTO responseDto = beerClient.getBeerById(dto.getId());
+		assertThat(responseDto.getId()).isEqualTo(dto.getId());
+	}
+
+	@Test
 	void testListBeers() throws JsonProcessingException {
 		String payload = objectMapper.writeValueAsString(getPage());
 
