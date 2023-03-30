@@ -35,7 +35,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author Donald F. Coffin, Green Button Alliance, Inc.
  */
 
-
 @RestClientTest
 @Import(RestTemplateBuilderConfig.class)
 public class BeerClientMockTest {
@@ -71,6 +70,19 @@ public class BeerClientMockTest {
 	}
 
 	@Test
+	void testUpdateBeer() {
+		server.expect(method(HttpMethod.PUT))
+				.andExpect(requestToUriTemplate(URL +
+						BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
+				.andRespond(withNoContent());
+
+		mockGetOperation();
+
+		BeerDTO responseDto = beerClient.updateBeer(dto);
+		assertThat(responseDto.getId()).isEqualTo(dto.getId());
+	}
+
+	@Test
 	void testCreateBeer() {
 		URI uri = UriComponentsBuilder.fromPath(BeerClientImpl.GET_BEER_BY_ID_PATH)
 						.build(dto.getId());
@@ -80,10 +92,7 @@ public class BeerClientMockTest {
 								BeerClientImpl.GET_BEER_PATH))
 								.andRespond(withAccepted().location(uri));
 
-		server.expect(method(HttpMethod.GET))
-				.andExpect(requestToUriTemplate(URL +
-						BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
-				.andRespond(withSuccess(dtoJson, MediaType.APPLICATION_JSON));
+		mockGetOperation();
 
 		BeerDTO responseDto = beerClient.createBeer(dto);
 		assertThat(responseDto.getId()).isEqualTo(dto.getId());
@@ -92,13 +101,17 @@ public class BeerClientMockTest {
 	@Test
 	void testGetById() {
 
+		mockGetOperation();
+
+		BeerDTO responseDto = beerClient.getBeerById(dto.getId());
+		assertThat(responseDto.getId()).isEqualTo(dto.getId());
+	}
+
+	private void mockGetOperation() {
 		server.expect(method(HttpMethod.GET))
 				.andExpect(requestToUriTemplate(URL +
 						BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
 				.andRespond(withSuccess(dtoJson, MediaType.APPLICATION_JSON));
-
-		BeerDTO responseDto = beerClient.getBeerById(dto.getId());
-		assertThat(responseDto.getId()).isEqualTo(dto.getId());
 	}
 
 	@Test
